@@ -3,6 +3,18 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Dict
 
+# Implementación simple de tabla de símbolos basada en hashing.
+#
+# Exporta:
+#  - SymKind: Enum con tipos de entrada (RESWORD, TABLE, COLUMN, IDENT, LITERAL, OP, TYPE, TYPEARG, EOF)
+#  - SymEntry: dataclass que representa una entrada de la tabla de símbolos
+#  - SymbolTable: clase con buckets, add(), entries(), stats()
+#
+# Notas:
+#  - El hash se calcula con md5 de la tupla (kind:value:line:col)
+#  - `add()` incrementa refs si la entrada ya existe en el bucket
+#  - `stats()` devuelve colisiones y recuentos por tipo
+
 class SymKind(Enum):
     RESWORD = "RESWORD"
     TABLE   = "TABLE"

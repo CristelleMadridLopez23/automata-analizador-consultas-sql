@@ -1,3 +1,16 @@
+<!-- Plantilla principal para la UI del analizador SQL.
+     Variables esperadas en el contexto:
+       - filename: nombre del archivo subido
+       - source: contenido original del archivo
+       - log: lista de strings de progreso
+       - errors: lista de mensajes de error
+       - tokens: lista de tokens (type, value, line, col)
+       - symtab: lista de entradas de tabla de símbolos
+       - stats: estadísticas de la tabla de símbolos
+     Notas:
+       - Limitar tamaño de tokens (ya muestra primeros 2000)
+       - Bootstrap 5 para estilo
+-->
 <!doctype html>
 <html lang="es">
 <head>

@@ -2,6 +2,19 @@ import re
 from enum import Enum
 from dataclasses import dataclass
 
+# Analizador léxico simple para un subconjunto de SQL.
+#
+# Exporta:
+#  - TokenType: Enum de tipos de token (RESWORD, IDENT, NUMBER, STRING, SYMBOL, OP, EOF)
+#  - Token: dataclass con {type, value, line, col}
+#  - Lexer: clase que tokeniza una cadena SQL con `tokenize()`
+#
+# Notas de implementación:
+#  - `RESWORDS` contiene palabras reservadas soportadas (se comparan en uppercase).
+#  - `token_regex` captura espacios, comentarios (--), identificadores, números, strings, operadores y símbolos.
+#  - El lexer emite tokens con posición (línea/columna) y añade un EOF final.
+#  - Revisar patrones y grupos de captura si se añaden nuevos símbolos/operadores.
+
 class TokenType(Enum):
     RESWORD = "RESWORD"
     IDENT   = "IDENT"

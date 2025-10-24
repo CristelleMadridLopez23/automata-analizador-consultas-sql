@@ -2,6 +2,20 @@ from .lexer import TokenType
 from .symbols import SymbolTable, SymKind
 from .errors import ErrorLog, ParseError
 
+# Parser ascendente/recursivo predictivo para un subconjunto de SQL.
+#
+# Clase Parser:
+#  - Constructor recibe lista de tokens, instancia de SymbolTable, ErrorLog y lista `progress` para mensajes.
+#  - `program()` itera sentencias hasta EOF.
+#  - Soporta producciones: SELECT, INSERT, UPDATE, CREATE (con gramática reducida).
+#  - Registra símbolos en SymbolTable y errores en ErrorLog.
+#
+# Recomendación: documentar cada producción con la forma BNF en comentarios (ya está parcialmente).
+# Referencias:
+#  - TokenType: analizador_sql/analizador_lexico/lexer.py
+#  - SymbolTable/SymKind: analizador_sql/analizador_lexico/symbols.py
+#  - ErrorLog/ParseError: analizador_sql/analizador_lexico/errors.py
+
 class Parser:
     def __init__(self, tokens, symtab: SymbolTable, errlog: ErrorLog, progress):
         self.toks = tokens

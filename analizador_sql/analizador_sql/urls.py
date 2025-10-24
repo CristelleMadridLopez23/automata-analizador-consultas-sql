@@ -19,6 +19,10 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 
+# Enrutado principal del proyecto. Incluye:
+#  - path('admin/', admin.site.urls)
+#  - path('', include('analizador_lexico.urls')) -> rutas de la app de análisis léxico
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('analizador_lexico.urls')),

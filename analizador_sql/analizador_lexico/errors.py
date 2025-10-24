@@ -1,5 +1,12 @@
 from dataclasses import dataclass
 
+# Definición simple de errores de parsing.
+#
+# - ParseError: dataclass con message, line, col
+# - ErrorLog: acumulador con `add()`, `as_list()`, `has_errors()`
+#
+# Uso: el Parser agrega ParseError a ErrorLog; la vista transforma a lista con as_list().
+
 @dataclass
 class ParseError:
     message: str

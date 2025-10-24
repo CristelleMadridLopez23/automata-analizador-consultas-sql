@@ -5,6 +5,17 @@ from .parser import Parser
 from .symbols import SymbolTable, SymKind
 from .errors import ErrorLog, ParseError
 
+# Vista principal `index` que procesa subida de archivo .sql:
+#  - Lee el archivo subido y lo pasa al Lexer -> tokens
+#  - Crea SymbolTable y ErrorLog
+#  - Ejecuta Parser para validar y llenar tabla de símbolos
+#  - Prepara contexto para la plantilla index.html
+# Referencias importantes en este archivo:
+#  - Lexer: analizador_sql/analizador_lexico/lexer.py
+#  - Parser: analizador_sql/analizador_lexico/parser.py
+#  - SymbolTable: analizador_sql/analizador_lexico/symbols.py
+#  - ErrorLog/ParseError: analizador_sql/analizador_lexico/errors.py
+
 def index(request):
     context = {
         "log": [],
