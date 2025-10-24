@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>🔎 Analizador SQL (Autómata/Gramática)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link
+   href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+   rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+  <h1 class="mb-3 text-primary">🔎 Analizador de Consultas SQL</h1>
+  <p class="text-muted">Carga un archivo <code>.sql</code> para validar las sentencias y generar la tabla de símbolos.</p>
+
+  <form method="post" enctype="multipart/form-data" class="mb-4">
+    {% csrf_token %}
+    <div class="input-group">
+      <input type="file" class="form-control" name="sqlfile" accept=".sql,.txt">
+      <button class="btn btn-primary">Analizar</button>
+    </div>
+  </form>
+
+  {% if filename %}
+  <div class="alert alert-info">Archivo: <strong>{{ filename }}</strong></div>
+  {% endif %}
+
+  <!-- Panel de progreso / “durante la evaluación” -->
+  {% if log %}
+  <div class="card mb-3">
+    <div class="card-header bg-secondary text-white">Progreso</div>
+    <div class="card-body">
+      <ol class="mb-0">
+        {% for l in log %}
+          <li>{{ l }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Errores -->
+  {% if errors and errors|length > 0 %}
+  <div class="alert alert-danger">
+    <h5 class="mb-2">❌ Errores encontrados</h5>
+    <ul class="mb-0">
+      {% for e in errors %}
+      <li>{{ e }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+    {% if filename %}
+    <div class="alert alert-success">✅ No se encontraron errores de sintaxis para las producciones soportadas.</div>
+    {% endif %}
+  {% endif %}
+
+  <!-- Tokens (muestra rápida) -->
+  {% if tokens %}
+  <div class="card mb-3">
+    <div class="card-header bg-success text-white">Tokens (primeros 2000)</div>
+    <div class="card-body table-responsive">
+      <table class="table table-sm table-bordered align-middle">
+        <thead class="table-light">
+          <tr><th>#</th><th>Tipo</th><th>Valor</th><th>Línea</th><th>Columna</th></tr>
+        </thead>
+        <tbody>
+          {% for t in tokens %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ t.type }}</td>
+            <td><code>{{ t.value }}</code></td>
+            <td>{{ t.line }}</td>
+            <td>{{ t.col }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Tabla de símbolos (colapsable al final) -->
+  {% if symtab %}
+  <p>
+    <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#symtab">
+      📊 Mostrar/Ocultar Tabla de Símbolos
+    </button>
+  </p>
+  <div class="collapse" id="symtab">
+    <div class="card">
+      <div class="card-header">Tabla de Símbolos</div>
+      <div class="card-body table-responsive">
+        <div class="row">
+          <div class="col-md-6">
+            <ul class="list-group mb-3">
+              <li class="list-group-item">Tamaño: {{ stats.size }}</li>
+              <li class="list-group-item">Entradas: {{ stats.total_entries }}</li>
+              <li class="list-group-item">Colisiones: {{ stats.collisions }}</li>
+              <li class="list-group-item">Factor de carga: {{ stats.load_factor }}</li>
+              <li class="list-group-item">
+                Por tipo:
+                <ul class="mb-0">
+                  {% for k, v in stats.by_kind.items %}
+                    <li><strong>{{ k }}</strong>: {{ v }}</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Hash</th><th>Kind</th><th>Valor</th><th>Línea</th><th>Col</th><th>Refs</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in symtab %}
+              <tr>
+                <td><code>{{ e.hash }}</code></td>
+                <td>{{ e.kind }}</td>
+                <td><code>{{ e.value }}</code></td>
+                <td>{{ e.line }}</td>
+                <td>{{ e.col }}</td>
+                <td>{{ e.refs }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Fuente (opcional) -->
+  {% if source %}
+  <div class="card mt-3">
+    <div class="card-header">Archivo fuente</div>
+    <div class="card-body">
+      <pre class="mb-0" style="white-space: pre-wrap;">{{ source }}</pre>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
