@@ -16,17 +16,6 @@ Proyecto educativo que implementa:
     - templates/index.html : UI para subir archivos .sql
 - test_data/ : archivos de consulta de ejemplo (válidas y con errores)
 
-## Uso (desarrollo)
-1. Crear y activar entorno virtual (macOS):
-   - python3 -m venv .venv
-   - source .venv/bin/activate
-2. Instalar dependencias:
-   - pip install -r requirements.txt  # (añadir requirements.txt si es necesario)
-3. Ejecutar servidor Django:
-   - python manage.py migrate
-   - python manage.py runserver
-4. Abrir http://127.0.0.1:8000 y subir un archivo `.sql`
-
 ## Pruebas
 - Añadir tests en `analizador_lexico/tests.py` y ejecutar:
   - python manage.py test
