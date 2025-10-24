@@ -45,7 +45,8 @@ class SymbolTable:
         return int(code[:8], 16) % self.size
 
     def add(self, token, kind: SymKind):
-        raw = f"{kind.value}:{token.value}:{token.line}:{token.col}"
+        # raw = f"{kind.value}:{token.value}:{token.line}:{token.col}"
+        raw = f"{kind.value}:{token.value}"
         h = hashlib.md5(raw.encode()).hexdigest()
         idx = self._idx(h)
         for e in self.buckets[idx]:
