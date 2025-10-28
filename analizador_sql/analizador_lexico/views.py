@@ -46,9 +46,20 @@ def index(request):
         # SYMBOL TABLE
         symtab = SymbolTable()
 
-        # Agregar EOF a tabla
-        eof = next(t for t in tokens if t.type == TokenType.EOF)
-        symtab.add(eof, SymKind.EOF)
+        # Poblar symtab directamente desde tokens (parser deshabilitado)
+        tt_to_kind = {
+            TokenType.RESWORD: SymKind.RESWORD,
+            TokenType.IDENT:   SymKind.IDENT,
+            TokenType.NUMBER:  SymKind.LITERAL,
+            TokenType.STRING:  SymKind.LITERAL,
+            TokenType.OP:      SymKind.OP,
+            TokenType.SYMBOL:  SymKind.IDENT,  # ajuste simple; refinar si es necesario
+            TokenType.EOF:     SymKind.EOF
+        }
+        for t in tokens:
+            kind = tt_to_kind.get(t.type)
+            if kind:
+                symtab.add(t, kind)
 
         # mostrar errores léxicos (sin parser)
         context["errors"] = errlog.as_list()
