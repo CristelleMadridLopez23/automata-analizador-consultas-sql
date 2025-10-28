@@ -37,29 +37,21 @@ def index(request):
         context["source"] = data
         context["filename"] = file.name
 
-        # ETAPA 6: iniciar proceso a partir de archivo
-        log = ["Archivo recibido. Iniciando tokenización…"]
-
-        # LEXER
-        lx = Lexer(data)
+        # LEXER + ERRORLOG
+        errlog = ErrorLog()
+        lx = Lexer(data, errlog)
         tokens = lx.tokenize()
         context["tokens"] = [{"type": t.type.name, "value": t.value, "line": t.line, "col": t.col} for t in tokens[:2000]]
 
-        # SYMBOL TABLE + ERRORS
+        # SYMBOL TABLE
         symtab = SymbolTable()
-        errlog = ErrorLog()
-
-        # PARSER
-        log.append("Iniciando parser/validación por gramática…")
-        parser = Parser(tokens, symtab, errlog, log)
-        parser.program()
 
         # Agregar EOF a tabla
         eof = next(t for t in tokens if t.type == TokenType.EOF)
         symtab.add(eof, SymKind.EOF)
 
-        context["log"] = log                  # “se muestra durante la evaluación”
-        context["errors"] = errlog.as_list()  # lista de errores
+        # mostrar errores léxicos (sin parser)
+        context["errors"] = errlog.as_list()
         context["symtab"] = [{
             "hash": e.hash[:8],
             "kind": e.kind.value,

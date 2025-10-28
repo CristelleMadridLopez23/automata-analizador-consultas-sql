@@ -1,6 +1,8 @@
 import re
 from enum import Enum
 from dataclasses import dataclass
+from typing import Optional
+from .errors import ParseError
 
 # Analizador léxico simple para un subconjunto de SQL.
 #
@@ -51,15 +53,20 @@ class Lexer:
         r"([,;\(\)\*\.\+])"                      # símbolos
     )
 
-    def __init__(self, text: str):
+    def __init__(self, text: str, errlog: Optional[object] = None):
         self.text = text
         self.pos = 0
         self.line = 1
         self.col = 1
         self.tokens = []
+        self.errlog = errlog
 
     def _emit(self, t: Token):
         self.tokens.append(t)
+
+    def _report(self, msg: str, line: int, col: int):
+        if self.errlog:
+            self.errlog.add(ParseError(msg, line, col))
 
     def tokenize(self):
         i = 0
@@ -68,6 +75,21 @@ class Lexer:
             if not m:
                 # carácter no reconocido
                 val = self.text[i]
+
+                # caso especial: comilla simple que no cierra -> error léxico de string sin cerrar
+                if val == "'":
+                    # buscar cierre
+                    j = self.text.find("'", i + 1)
+                    if j == -1:
+                        self._report("String sin cerrar", self.line, self.col)
+                        # consumir hasta EOF
+                        remaining = len(self.text) - i
+                        self.col += remaining
+                        i = len(self.text)
+                        break
+
+                # reportar carácter no reconocido y emitir token simbólico (opcional)
+                self._report(f"Carácter no reconocido: '{val}'", self.line, self.col)
                 self._emit(Token(TokenType.SYMBOL, val, self.line, self.col))
                 i += 1
                 self.col += 1
