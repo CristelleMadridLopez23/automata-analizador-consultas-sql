@@ -53,13 +53,21 @@ def index(request):
             TokenType.NUMBER:  SymKind.LITERAL,
             TokenType.STRING:  SymKind.LITERAL,
             TokenType.OP:      SymKind.OP,
-            TokenType.SYMBOL:  SymKind.IDENT,  # ajuste simple; refinar si es necesario
             TokenType.EOF:     SymKind.EOF
         }
+
         for t in tokens:
-            kind = tt_to_kind.get(t.type)
-            if kind:
-                symtab.add(t, kind)
+            if t.type == TokenType.SYMBOL:
+                # opción A: guardarlos como SYMBOL
+                if t.value in {',',';','(',')','*','.'}:
+                    symtab.add(t, SymKind.SYMBOL)
+                # opción B (alternativa): ignorar símbolos
+                # else:
+                #     continue
+            else:
+                kind = tt_to_kind.get(t.type)
+                if kind:
+                    symtab.add(t, kind)
 
         # mostrar errores léxicos (sin parser)
         context["errors"] = errlog.as_list()

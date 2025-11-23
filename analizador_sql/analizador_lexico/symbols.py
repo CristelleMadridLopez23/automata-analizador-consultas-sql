@@ -22,6 +22,7 @@ class SymKind(Enum):
     IDENT   = "IDENT"
     LITERAL = "LITERAL"
     OP      = "OP"
+    SYMBOL  = "SYMBOL"  
     TYPE    = "TYPE"
     TYPEARG = "TYPEARG"
     EOF     = "EOF"
