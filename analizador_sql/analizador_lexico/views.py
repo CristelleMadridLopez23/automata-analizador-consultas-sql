@@ -4,6 +4,7 @@ from .lexer import Lexer, TokenType
 from .parser import Parser
 from .symbols import SymbolTable, SymKind
 from .errors import ErrorLog, ParseError
+from .lexer import TokenType
 
 # Vista principal `index` que procesa subida de archivo .sql:
 #  - Lee el archivo subido y lo pasa al Lexer -> tokens
@@ -44,6 +45,13 @@ def index(request):
         lx = Lexer(data)
         tokens = lx.tokenize()
         context["tokens"] = [{"type": t.type.name, "value": t.value, "line": t.line, "col": t.col} for t in tokens[:2000]]
+        
+        # Exponer los mismos tokens para el modal tokenizado (se usan en la plantilla para pintar badges)
+        context["tokenized_tokens"] = context["tokens"]
+
+        # Construir fuente tokenizado (opcional si quieres una cadena plana)
+        tokenized_source = " ".join(t.type.name for t in tokens)
+        context["tokenized_source"] = tokenized_source
 
         # SYMBOL TABLE + ERRORS
         symtab = SymbolTable()

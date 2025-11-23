@@ -67,12 +67,13 @@ class Parser:
         sel = self.eat(TokenType.RESWORD, {'SELECT'})
         self.symtab.add(sel, SymKind.RESWORD)
         self.column_list()
-        self.eat(TokenType.RESWORD, {'FROM'})
+        frm = self.eat(TokenType.RESWORD, {'FROM'})
+        self.symtab.add(frm, SymKind.RESWORD)  # Agregar FROM
         table = self.eat(TokenType.IDENT)
         self.symtab.add(table, SymKind.TABLE)
         if self.t().value == 'WHERE':
             w = self.eat(TokenType.RESWORD, {'WHERE'})
-            self.symtab.add(w, SymKind.RESWORD)
+            self.symtab.add(w, SymKind.RESWORD)  # Ya está, pero confirmar
             self.cond()
 
     # COLUMN_LIST → * | IDENT (',' IDENT)*
@@ -107,10 +108,12 @@ class Parser:
     # INSERT_STMT → INSERT INTO IDENT '(' IDENT_LIST ')' VALUES '(' LITERAL_LIST ')'
     def insert_stmt(self):
         ins = self.eat(TokenType.RESWORD, {'INSERT'}); self.symtab.add(ins, SymKind.RESWORD)
-        self.eat(TokenType.RESWORD, {'INTO'})
+        into = self.eat(TokenType.RESWORD, {'INTO'})
+        self.symtab.add(into, SymKind.RESWORD)  # Agregar INTO
         tbl = self.eat(TokenType.IDENT); self.symtab.add(tbl, SymKind.TABLE)
+        vals = self.eat(TokenType.RESWORD, {'VALUES'})
+        self.symtab.add(vals, SymKind.RESWORD)  # Agregar VALUES
         self.eat(TokenType.SYMBOL, {'('}); self.ident_list(); self.eat(TokenType.SYMBOL, {')'})
-        self.eat(TokenType.RESWORD, {'VALUES'})
         self.eat(TokenType.SYMBOL, {'('}); self.literal_list(); self.eat(TokenType.SYMBOL, {')'})
 
     def ident_list(self):
@@ -138,7 +141,8 @@ class Parser:
     def update_stmt(self):
         up = self.eat(TokenType.RESWORD, {'UPDATE'}); self.symtab.add(up, SymKind.RESWORD)
         tbl = self.eat(TokenType.IDENT); self.symtab.add(tbl, SymKind.TABLE)
-        self.eat(TokenType.RESWORD, {'SET'})
+        set_kw = self.eat(TokenType.RESWORD, {'SET'})
+        self.symtab.add(set_kw, SymKind.RESWORD)  # Agregar SET
         self.assign_list()
         if self.t().value == 'WHERE':
             w = self.eat(TokenType.RESWORD, {'WHERE'}); self.symtab.add(w, SymKind.RESWORD)
@@ -158,7 +162,8 @@ class Parser:
     # CREATE_STMT → CREATE TABLE IDENT '(' COLDEF_LIST ')'
     def create_stmt(self):
         cr = self.eat(TokenType.RESWORD, {'CREATE'}); self.symtab.add(cr, SymKind.RESWORD)
-        self.eat(TokenType.RESWORD, {'TABLE'})
+        tbl_kw = self.eat(TokenType.RESWORD, {'TABLE'})
+        self.symtab.add(tbl_kw, SymKind.RESWORD)  # Agregar TABLE
         tbl = self.eat(TokenType.IDENT); self.symtab.add(tbl, SymKind.TABLE)
         self.eat(TokenType.SYMBOL, {'('}); self.coldef_list(); self.eat(TokenType.SYMBOL, {')'})
 
