@@ -25,3 +25,22 @@ class ErrorLog:
 
     def has_errors(self):
         return len(self.items) > 0
+
+@dataclass
+class LexError:
+    message: str
+    line: int
+    col: int
+
+class LexErrorLog:
+    def __init__(self):
+        self.items = []
+
+    def add(self, err: LexError):
+        self.items.append(err)
+
+    def as_list(self):
+        return [f"L{e.line}:C{e.col} - {e.message}" for e in self.items]
+
+    def has_errors(self):
+        return len(self.items) > 0

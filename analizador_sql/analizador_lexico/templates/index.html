@@ -78,9 +78,17 @@
                         file:bg-indigo-600 file:text-white file:border-0 file:rounded-lg
                         file:px-4 file:py-2 hover:file:bg-indigo-700">
         </div>
-        <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 py-2.5 font-semibold">
-          Analizar
-        </button>
+
+        <div class="flex gap-2">
+          <button type="submit" name="mode" value="lex"
+                  class="bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-4 py-2.5 font-semibold">
+            Analizar (léxico)
+          </button>
+          <button type="submit" name="mode" value="full"
+                  class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2.5 font-semibold">
+            Analizar (sintáctico)
+          </button>
+        </div>
       </form>
 
       {% if filename %}
@@ -90,125 +98,76 @@
       {% endif %}
     </section>
 
-    <!-- ERRORES -->
-    {% if errors and errors|length > 0 %}
-    <section class="rounded-2xl border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/30 p-6 mb-8">
-      <h2 class="text-lg font-semibold text-rose-700 dark:text-rose-300 mb-2">❌ Errores encontrados</h2>
-      <ul class="text-sm space-y-1">
-        {% for e in errors %}
-        <li class="font-mono">{{ e }}</li>
-        {% endfor %}
-      </ul>
-    </section>
-    {% elif filename %}
-    <section class="rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 p-6 mb-8">
-      <h2 class="text-lg font-semibold text-emerald-700 dark:text-emerald-300">✅ No se encontraron errores de sintaxis.</h2>
-      <p class="text-sm text-emerald-700/80 dark:text-emerald-300/80">
-        Las producciones soportadas fueron validadas correctamente.
-      </p>
-    </section>
-    {% endif %}
-
-    <!-- TOKENS -->
-    {% comment %} {% if tokens %}
-    <section class="bg-white dark:bg-slate-800 rounded-2xl shadow ring-1 ring-slate-200 dark:ring-slate-700 p-6 mb-8">
-      <div class="flex justify-between items-center mb-4">
-        <span class="text-sm text-slate-500 dark:text-slate-400">Total: {{ tokens|length }}</span>
-      </div>
-
-      <!-- Grid: Tokens (izquierda) + Symbols (derecha) -->
-      <div class="grid gap-6 sm:grid-cols-1 lg:grid-cols-[1fr_360px]">
-        <!-- TOKENS TABLE -->
-        <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-          <div class="max-h-80 overflow-y-auto">
+    <section>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow ring-1 ring-slate-200 dark:ring-slate-700 p-6">
+        <h3 class="font-semibold mt-2 mb-2">Tabla de símbolos</h3>
+          <div class="max-h-48 overflow-y-auto mb-3">
             <table class="min-w-full text-sm">
               <thead class="bg-slate-100 dark:bg-slate-900 sticky top-0">
                 <tr class="text-left">
-                  <th class="px-4 py-2">#</th>
-                  <th class="px-4 py-2">Tipo</th>
-                  <th class="px-4 py-2">Valor</th>
-                  <th class="px-4 py-2">Línea</th>
-                  <th class="px-4 py-2">Col</th>
+                  <th class="px-3 py-2 font-mono">Hash</th><th class="px-3 py-2">Tipo</th><th class="px-3 py-2">Valor</th><th class="px-3 py-2">Línea</th><th class="px-3 py-2">Col</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-              {% for t in tokens %}
-              <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-900/50">
-                <td class="px-4 py-2">{{ forloop.counter }}</td>
-                <td class="px-4 py-2">
-                  {% with t.type as kind %}
-                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold
-                      {% if kind == 'RESWORD' %} bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300
-                      {% elif kind == 'IDENT' %} bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300
-                      {% elif kind == 'NUMBER' %} bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300
-                      {% elif kind == 'STRING' %} bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/40 dark:text-fuchsia-300
-                      {% elif kind == 'OP' %} bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300
-                      {% elif kind == 'SYMBOL' %} bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200
-                      {% else %} bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-300 {% endif %}">
-                      {{ t.type }}
-                    </span>
-                  {% endwith %}
-                </td>
-                <td class="px-4 py-2"><code class="font-mono text-[13px]">{{ t.value }}</code></td>
-                <td class="px-4 py-2">{{ t.line }}</td>
-                <td class="px-4 py-2">{{ t.col }}</td>
-              </tr>
-              {% endfor %}
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-sm">
+                {% for e in symtab %}
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                  <td class="px-3 py-2 font-mono text-xs">{{ e.hash }}</td>
+                  <td class="px-3 py-2 text-xs">{{ e.kind }}</td>
+                  <td class="px-3 py-2 font-mono text-xs">{{ e.value }}</td>
+                  <td class="px-3 py-2">{{ e.line }}</td>
+                  <td class="px-3 py-2">{{ e.col }}</td>
+                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
-        </div> {% endcomment %}
-
-        <!-- SYMBOLS TABLE (muestra sólo si hay symtab) -->
-        <section class="bg-white dark:bg-slate-800 rounded-2xl shadow ring-1 ring-slate-200 dark:ring-slate-700 p-6 mb-8">
-          <h2 class="text-lg font-semibold text-emerald-700 dark:text-emerald-300">Tabla de simbolos📊</h2>
-        {% if symtab %}
-        <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-          <div class="max-h-80 overflow-y-auto">
-            <table class="min-w-full text-sm">
-              <thead class="bg-slate-100 dark:bg-slate-900 sticky top-0">
-                <tr class="text-left">
-                    <th class="px-3 py-2 font-mono">Hash</th>
-                    <th class="px-3 py-2">Tipo</th>
-                    <th class="px-3 py-2">Valor</th>
-                    <th class="px-3 py-2">Línea</th>
-                    <th class="px-3 py-2">Col</th>
-                    <th class="px-3 py-2">Refs</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-sm">
-                  {% for e in symtab %}
-                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                    <td class="px-3 py-2 font-mono text-xs">{{ e.hash }}</td>
-                    <td class="px-3 py-2">
-                    {% with e.kind as kind %}
-                      <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold
-                        {% if kind == 'RESWORD' %} bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300
-                        {% elif kind == 'IDENT' or kind == 'COLUMN' %} bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300
-                        {% elif kind == 'TABLE' %} bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300
-                        {% elif kind == 'LITERAL' %} bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/40 dark:text-fuchsia-300
-                        {% elif kind == 'OP' %} bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300
-                        {% elif kind == 'TYPE' %} bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300
-                        {% elif kind == 'TYPEARG' %} bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300
-                        {% elif kind == 'EOF' %} bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200
-                        {% else %} bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-300 {% endif %}">
-                        {{ e.kind }}
-                      </span>
-                    {% endwith %}
-                  </td>
-                    <td class="px-3 py-2 font-mono text-xs">{{ e.value }}</td>
-                    <td class="px-3 py-2">{{ e.line }}</td>
-                    <td class="px-3 py-2">{{ e.col }}</td>
-                    <td class="px-3 py-2">{{ e.refs }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
-        {% comment %} {% endif %} {% endcomment %}
+        <br>
+      </section>
+
+
+    <!-- RESULTADOS: LÉXICO (izq) | SINTÁCTICO (der) -->
+    <section class="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 mb-8">
+      <!-- LÉXICO -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow ring-1 ring-slate-200 dark:ring-slate-700 p-6">
+        <h2 class="text-lg font-semibold text-sky-700 dark:text-sky-300 mb-3">🔤 Análisis léxico</h2>
+
+        <h3 class="font-semibold mb-2">Errores léxicos</h3>
+        {% if lex.errors %}
+          <ul class="text-sm space-y-1 mb-3">
+            {% for e in lex.errors %}
+            <li class="font-mono text-rose-700 dark:text-rose-300">{{ e }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">No se detectaron errores léxicos.</p>
+        {% endif %}
+
       </div>
+
+      <!-- SINTÁCTICO -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow ring-1 ring-slate-200 dark:ring-slate-700 p-6">
+        <h2 class="text-lg font-semibold text-emerald-700 dark:text-emerald-300 mb-3">📊 Análisis sintáctico</h2>
+
+        <h3 class="font-semibold mb-2">Errores sintácticos</h3>
+        {% if parse.errors %}
+          <ul class="text-sm space-y-1 mb-3">
+            {% for e in parse.errors %}
+            <li class="font-mono text-rose-700 dark:text-rose-300">{{ e }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">No hay errores sintácticos reportados.</p>
+        {% endif %}
+
+      </div>
+    </section>
+
+    <section>
+      <h3 class="font-semibold mt-2 mb-2">Estadísticas</h3>
+        <pre class="text-xs font-mono text-slate-600 dark:text-slate-300 p-3 bg-slate-50 dark:bg-slate-800 rounded">{{ parse.stats }}</pre>
+        <br>
+      </section>
 
       <div class="mt-6 flex gap-4 justify-center">
         {% if source %}
@@ -223,8 +182,6 @@
         {% endif %}
       </div>
     </section>
-    {% endif %}
-  </div>
 
   <!-- MODALES -->
   <template x-if="showSymbols">
@@ -298,11 +255,11 @@
           </div>
 
           <!-- Mostrar además los valores (opcional) -->
-          <div class="mt-4 text-xs font-mono text-slate-600 dark:text-slate-300">
+          {% comment %} <div class="mt-4 text-xs font-mono text-slate-600 dark:text-slate-300">
             {% for t in tokenized_tokens %}
             <span class="inline-block mr-2 px-2 py-1 rounded border border-slate-200 dark:border-slate-700">{{ t.value }}</span>
             {% endfor %}
-          </div>
+          </div> {% endcomment %}
         </div>
       </div>
     </div>

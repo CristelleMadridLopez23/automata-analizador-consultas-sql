@@ -15,6 +15,7 @@ from typing import List, Dict
 #  - `add()` incrementa refs si la entrada ya existe en el bucket
 #  - `stats()` devuelve colisiones y recuentos por tipo
 
+
 class SymKind(Enum):
     RESWORD = "RESWORD"
     TABLE   = "TABLE"
@@ -26,6 +27,7 @@ class SymKind(Enum):
     TYPEARG = "TYPEARG"
     EOF     = "EOF"
 
+
 @dataclass
 class SymEntry:
     hash: str
@@ -34,6 +36,7 @@ class SymEntry:
     line: int
     col: int
     refs: int = 1
+
 
 class SymbolTable:
     def __init__(self, size=1024):
@@ -45,32 +48,42 @@ class SymbolTable:
         return int(code[:8], 16) % self.size
 
     def add(self, token, kind: SymKind):
-        # raw = f"{kind.value}:{token.value}:{token.line}:{token.col}"
-        raw = f"{kind.value}:{token.value}"
+        raw = token.value.lower()
         h = hashlib.md5(raw.encode()).hexdigest()
         idx = self._idx(h)
-        for e in self.buckets[idx]:
-            if e.hash == h:
-                e.refs += 1
+
+        for entry in self.buckets[idx]:
+            if entry.hash == h:
+                entry.refs += 1
                 return
-        self.buckets[idx].append(SymEntry(hash=h, kind=kind, value=token.value, line=token.line, col=token.col))
+
+        self.buckets[idx].append(
+            SymEntry(
+                hash=h,
+                kind=kind,
+                value=token.value,
+                line=token.line,
+                col=token.col,
+            )
+        )
         self.total += 1
 
-    def entries(self) -> List[SymEntry]:
-        out: List[SymEntry] = []
+    def entries(self):
+        out = []
         for b in self.buckets:
             out.extend(b)
         return out
 
-    def stats(self) -> Dict:
-        collisions = sum(max(0, len(b)-1) for b in self.buckets)
-        by_kind: Dict[str,int] = {}
+    def stats(self):
+        collisions = sum(max(0, len(b) - 1) for b in self.buckets)
+        by_kind = {}
         for e in self.entries():
             by_kind[e.kind.value] = by_kind.get(e.kind.value, 0) + 1
+
         return {
             "size": self.size,
             "total_entries": self.total,
             "collisions": collisions,
             "load_factor": round(self.total / self.size, 4),
-            "by_kind": by_kind
+            "by_kind": by_kind,
         }
