@@ -30,7 +30,7 @@ class TokenType(Enum):
 RESWORDS = {
     "SELECT","FROM","WHERE","INSERT","INTO","VALUES",
     "UPDATE","SET","CREATE","TABLE","PRIMARY","KEY",
-    "NULL","INT","VARCHAR","FLOAT","AND","OR","NOT"
+    "NULL","INT","VARCHAR","FLOAT","AND","OR","NOT",
 }
 
 SYMBOLS = {',',';','(',')','*','.'}

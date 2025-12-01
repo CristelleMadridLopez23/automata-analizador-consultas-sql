@@ -160,6 +160,20 @@ def index(request):
         # Mostrar finalmente la symtab del parser (derivada del léxico)
         context["symtab"] = context["parse"]["symtab"]
         context["stats"] = context["parse"]["stats"]
+        
+        # ...existing code...
+        context["tokens"] = [
+            {"type": t.type.name, "value": t.value, "line": t.line, "col": t.col}
+            for t in tokens
+        ]
+        # representación textual "tokenizada" para mostrar en la UI/modales
+        # ejemplo: "RESWORD:SELECT IDENT:tabla1 SYMBOL:;"
+        context["tokenized_source"] = " ".join(
+            f"{t.type.name}:{t.value}" for t in tokens if t.type != TokenType.EOF
+        )
+        # opcional: lista ya lista para el modal con más detalle
+        context["tokenized_tokens"] = context["tokens"]
+# ...existing code...
 
     return render(request, "index.html", context)
 
