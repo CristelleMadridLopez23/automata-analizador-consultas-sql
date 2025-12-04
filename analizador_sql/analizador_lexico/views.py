@@ -97,6 +97,7 @@ def index(request):
                 "line": e.line,
                 "col": e.col,
                 "refs": e.refs,
+                "idx": e.idx,
             }
             for e in lex_symtab.entries()
         ]
@@ -124,6 +125,19 @@ def index(request):
                 "stats": {},
                 "log": ["Modo léxico: parser no ejecutado."]
             }
+            
+            context["tokens"] = [
+                {"type": t.type.name, "value": t.value, "line": t.line, "col": t.col}
+                for t in tokens
+            ]
+            # representación textual "tokenizada" para mostrar en la UI/modales
+            # ejemplo: "RESWORD:SELECT IDENT:tabla1 SYMBOL:;"
+            context["tokenized_source"] = " ".join(
+                f"{t.type.name}:{t.value}" for t in tokens if t.type != TokenType.EOF
+            )
+            # opcional: lista ya lista para el modal con más detalle
+            context["tokenized_tokens"] = context["tokens"]
+
             return render(request, "index.html", context)
 
         # ==========================================================
@@ -150,6 +164,7 @@ def index(request):
                     "line": e.line,
                     "col": e.col,
                     "refs": e.refs,
+                    "idx": e.idx,  # <--- AGREGAR ESTA LÍNEA
                 }
                 for e in lex_symtab.entries()
             ],
@@ -161,7 +176,7 @@ def index(request):
         context["symtab"] = context["parse"]["symtab"]
         context["stats"] = context["parse"]["stats"]
         
-        # ...existing code...
+        
         context["tokens"] = [
             {"type": t.type.name, "value": t.value, "line": t.line, "col": t.col}
             for t in tokens
@@ -173,7 +188,6 @@ def index(request):
         )
         # opcional: lista ya lista para el modal con más detalle
         context["tokenized_tokens"] = context["tokens"]
-# ...existing code...
 
     return render(request, "index.html", context)
 

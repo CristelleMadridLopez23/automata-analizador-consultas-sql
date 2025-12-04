@@ -30,6 +30,7 @@ class SymKind(Enum):
 
 @dataclass
 class SymEntry:
+    idx: int      # <--- Agregamos este campo para guardar el índice del bucket
     hash: str
     kind: SymKind
     value: str
@@ -55,10 +56,15 @@ class SymbolTable:
         for entry in self.buckets[idx]:
             if entry.hash == h:
                 entry.refs += 1
+                # CORRECCIÓN: Si ya existe como IDENT pero ahora sabemos que es algo más específico
+                # (TABLE, COLUMN, TYPE, etc.), actualizamos su tipo.
+                if entry.kind == SymKind.IDENT and kind != SymKind.IDENT:
+                    entry.kind = kind
                 return
 
         self.buckets[idx].append(
             SymEntry(
+                idx=idx,  # Ahora esto funcionará correctamente
                 hash=h,
                 kind=kind,
                 value=token.value,
